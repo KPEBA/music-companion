@@ -1,0 +1,175 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0f14;
+  --panel: #121822;
+  --line: #2a3340;
+  --text: #f4f7fb;
+  --muted: #9aa7b4;
+  --accent: #7c5cff;
+  --accent-2: #2dd4bf;
+  --danger: #f85149;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.shell { max-width: 1600px; margin: 0 auto; padding: 24px; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+.top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.kicker { color: var(--accent-2); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+h1, h2 { margin: 0; }
+h1 { font-size: 32px; line-height: 1.05; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+.grid { display: grid; gap: 16px; }
+.panel { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 16px; }
+.section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 12px; }
+.section-head p { margin: 6px 0 0; font-size: 13px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.row input { flex: 1 1 240px; }
+label { display: block; margin: 12px 0 6px; color: var(--muted); font-size: 13px; }
+input {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d131c;
+  color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+}
+button {
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+button.secondary { background: #171f2b; border-color: var(--line); }
+button.danger { background: rgba(248, 81, 73, .14); border-color: rgba(248, 81, 73, .45); color: #ffd9d7; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.badge { border: 1px solid var(--line); border-radius: 999px; padding: 8px 11px; color: var(--muted); background: #171f2b; }
+.badge.ok { color: #dffcf7; border-color: rgba(45, 212, 191, .45); background: rgba(45, 212, 191, .12); }
+.muted { color: var(--muted); }
+.warning { border: 1px solid rgba(245, 158, 11, .45); border-radius: 8px; background: rgba(245, 158, 11, .12); color: #fde68a; padding: 10px 12px; font-size: 13px; }
+.player-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.request-grid { align-items: start; }
+.player-shell {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #06090d;
+}
+.player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.player iframe {
+  width: 100%;
+  height: 100%;
+}
+.player-poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background-color: #06090d;
+  background-position: center;
+  background-size: cover;
+  color: #f4f7fb;
+  font-weight: 800;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .9);
+}
+.player-poster[hidden] { display: none; }
+.label-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-weight: 800; }
+.compact-actions { margin-bottom: 10px; }
+.youtube-music-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.youtube-music-card .section-head {
+  flex: 0 0 auto;
+}
+.youtube-music-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d131c;
+  padding: 10px;
+}
+.youtube-music-panel[hidden] { display: none; }
+.youtube-music-panel .label-row,
+.youtube-music-panel .compact-actions {
+  flex: 0 0 auto;
+}
+.music-webview-shell {
+  flex: 0 0 auto;
+  min-height: 0;
+  height: clamp(480px, calc(100vh - 300px), 860px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #06090d;
+}
+.music-webview-shell webview {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+}
+.music-webview-shell.unloaded {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.music-webview-shell.unloaded::before {
+  content: "YouTube Music is unloaded to save CPU/GPU. Use Load YouTube Music only when you need Companion to pause/resume your background music.";
+  max-width: 680px;
+  padding: 18px;
+  text-align: center;
+  line-height: 1.45;
+}
+.music-webview-shell.unloaded webview {
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.fallback-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d131c;
+  padding: 10px;
+}
+.fallback-panel summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 800;
+}
+.fallback-player-shell { margin-top: 10px; }
+.current { border: 1px solid var(--line); border-radius: 8px; background: #0d131c; padding: 12px; overflow-wrap: anywhere; }
+.log { display: grid; gap: 6px; margin-top: 12px; max-height: 180px; overflow: auto; color: var(--muted); font-size: 13px; }
+.log div { border-top: 1px solid rgba(154, 167, 180, .16); padding-top: 6px; }
+@media (max-width: 840px) {
+  .top, .section-head, .player-grid { display: grid; grid-template-columns: 1fr; }
+  .music-webview-shell { height: clamp(420px, calc(100vh - 220px), 760px); }
+}

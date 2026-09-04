@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="KPEBA Music Companion">
+  <rect width="256" height="256" rx="56" fill="#111827"/>
+  <circle cx="82" cy="78" r="24" fill="#8b5cf6"/>
+  <path fill="#22d3ee" d="M104 70h76v24h-76zM104 116h56v24h-56z"/>
+  <path fill="#f59e0b" d="M86 110v56a31 31 0 1 1-18-28V88h22v22h-4z"/>
+  <path fill="#ffffff" d="M177 116c20 0 36 16 36 36s-16 36-36 36-36-16-36-36 16-36 36-36zm-9 18v36l28-18-28-18z"/>
+</svg>

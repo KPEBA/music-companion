@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://music.youtube.com https://accounts.google.com; child-src https://www.youtube.com https://www.youtube-nocookie.com https://music.youtube.com https://accounts.google.com; img-src 'self' https://i.ytimg.com https://*.googleusercontent.com data:; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:* http://127.0.0.1:* https:;" />
+  <title>KPEBA Music Companion</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div>
+        <div class="kicker">KPEBA Music Companion</div>
+        <h1>YouTube song requests for Twitch</h1>
+      </div>
+      <div class="top-actions">
+        <button id="openDashboard" class="secondary">Open dashboard</button>
+        <span id="connectionBadge" class="badge">not paired</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Pairing</h2>
+        <label>Local AI API URL</label>
+        <div class="row">
+          <input id="apiBaseUrl" placeholder="https://local-ai-production.up.railway.app" />
+          <button id="saveApiBase">Save</button>
+        </div>
+        <label>Pairing code from Dashboard -> Music</label>
+        <div class="row">
+          <input id="pairingCode" placeholder="ABCDEFGH" maxlength="12" />
+          <button id="claimPairing">Pair companion</button>
+        </div>
+        <p id="pairingStatus" class="muted">Pair with a short code. Device tokens are stored in this app only.</p>
+        <p id="storageWarning" class="warning" hidden></p>
+        <div class="row">
+          <button id="reconnectEvents" class="secondary">Reconnect</button>
+          <button id="copyStatus" class="secondary">Copy device status</button>
+          <button id="resetPairing" class="danger">Reset pairing</button>
+        </div>
+      </article>
+
+      <article class="panel youtube-music-card">
+        <div class="section-head">
+          <div>
+            <h2>Your YouTube Music</h2>
+            <p class="muted">Optional heavy background player. Keep it unloaded during game streams if OBS or the game starts lagging.</p>
+          </div>
+          <span id="backgroundState" class="badge">idle</span>
+        </div>
+        <div id="youtubeMusicPanel" class="youtube-music-panel">
+          <div class="label-row">
+            <span>YouTube Music</span>
+            <span id="youtubeMusicState" class="muted">not loaded</span>
+          </div>
+          <div class="row compact-actions">
+            <button id="openYouTubeMusic" class="secondary" title="Load YouTube Music inside this Companion window">Load YouTube Music</button>
+            <button id="openYouTubeMusicExternal" class="secondary">Open in browser</button>
+            <button id="pauseYouTubeMusic" class="secondary">Pause music</button>
+            <button id="playYouTubeMusic" class="secondary">Resume music</button>
+            <button id="reloadYouTubeMusic" class="secondary">Reload</button>
+            <button id="unloadYouTubeMusic" class="danger">Unload</button>
+          </div>
+          <p id="youtubeMusicHint" class="warning">Performance mode: embedded YouTube Music is not loaded. Song requests still work in the separate request player.</p>
+          <div id="musicWebviewShell" class="music-webview-shell">
+            <webview
+              id="youtubeMusicWebview"
+              src="about:blank"
+              style="display:inline-flex;width:100%;height:720px"
+              autosize="on"
+              minwidth="900"
+              minheight="720"
+              maxwidth="1920"
+              maxheight="1200"
+              partition="persist:youtube-music"
+              webpreferences="contextIsolation=yes,nodeIntegration=no"
+            ></webview>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel request-card">
+        <h2>Separate song request playback</h2>
+        <div class="player-grid request-grid">
+          <div>
+            <div class="label-row"><span>Request</span><span id="requestState" class="muted">idle</span></div>
+            <div class="player-shell">
+              <div id="requestPlayer" class="player"></div>
+              <div id="requestPoster" class="player-poster">Waiting for a song request.</div>
+            </div>
+            <div class="row">
+              <button id="skipRequest" class="secondary">Skip request</button>
+              <button id="resumeBackground" class="secondary">Resume background</button>
+            </div>
+          </div>
+          <div>
+            <details class="fallback-panel" open>
+              <summary>Fallback single-video background</summary>
+              <label>Background YouTube video ID</label>
+              <div class="row">
+                <input id="backgroundVideoId" placeholder="YouTube video URL or ID" />
+                <button id="loadBackground">Load fallback</button>
+              </div>
+              <div class="player-shell fallback-player-shell">
+                <div id="backgroundPlayer" class="player"></div>
+                <div id="backgroundPoster" class="player-poster">Load a fallback YouTube video.</div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Current</h2>
+        <div id="currentTrack" class="current">Nothing playing.</div>
+        <div id="eventLog" class="log"></div>
+      </article>
+    </section>
+  </main>
+  <script src="./renderer.js"></script>
+</body>
+</html>

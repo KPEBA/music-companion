@@ -1,0 +1,76 @@
+{
+  "name": "music-companion",
+  "version": "0.1.14",
+  "description": "Windows desktop companion for KPEBA Local AI Twitch song requests.",
+  "author": "KPEBA",
+  "private": true,
+  "main": "dist/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint \"src/**/*.{ts,js}\" \"scripts/**/*.mjs\"",
+    "start": "electron dist/main.js",
+    "dev": "npm run build && npm run start",
+    "pack": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --dir",
+    "dist:win": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip",
+    "release:music-companion": "npm run dist:win"
+  },
+  "build": {
+    "appId": "app.kpeba.localai.musiccompanion",
+    "productName": "KPEBA Music Companion",
+    "copyright": "Copyright © 2026 KPEBA",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "dist/main.js"
+    },
+    "npmRebuild": false,
+    "buildDependenciesFromSource": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "KPEBA-Music-Companion-${version}-${os}-${arch}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "KPEBA Music Companion"
+    },
+    "publish": null
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/node": "^22.17.1",
+    "app-builder-bin": "^5.0.0-alpha.10",
+    "cross-env": "^10.1.0",
+    "electron": "44.0.0",
+    "electron-builder": "^26.15.3",
+    "eslint": "^9.33.0",
+    "globals": "^15.15.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.1"
+  }
+}
