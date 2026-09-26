@@ -203,8 +203,15 @@ function closeRequestWindow(): void {
   }
 }
 
-app.whenReady().then(() => {
-  void createWindow();
+app.whenReady().then(async () => {
+  await createWindow();
+
+  // Fresh launch triggered by the OS opening kpeba-music://pair?code=... (the app wasn't
+  // already running, so this didn't go through the "second-instance" event above).
+  const startupCode = extractPairingCodeFromArgv(process.argv);
+  if (startupCode) {
+    void claimFromDeepLink(startupCode);
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -252,7 +259,7 @@ ipcMain.handle("config:save-api-base", (_event, apiBaseUrl: string) => {
   return writeConfig({ apiBaseUrl: nextApiBaseUrl });
 });
 
-ipcMain.handle("pairing:claim", async (_event, code: string, deviceName: string) => {
+async function performClaim(code: string, deviceName: string): Promise<CompanionConfig> {
   const config = readConfig();
   const response = await fetch(`${config.apiBaseUrl}/api/music/companion/claim`, {
     method: "POST",
@@ -271,6 +278,72 @@ ipcMain.handle("pairing:claim", async (_event, code: string, deviceName: string)
     statusUrl: result.statusUrl,
     streamer: result.streamer
   });
+}
+
+ipcMain.handle("pairing:claim", async (_event, code: string, deviceName: string) => performClaim(code, deviceName));
+
+/**
+ * Deep-link pairing: the dashboard's "Open in app" button links to
+ * kpeba-music://pair?code=XXXXXXXX so the streamer never has to manually retype the code.
+ * Handles both the Windows/Linux second-instance path (URL arrives as an argv entry on an
+ * already-running instance) and the fresh-launch path (URL is in argv on first start).
+ */
+function extractPairingCodeFromArgv(argv: string[]): string | null {
+  const deepLink = argv.find((arg) => arg.startsWith("kpeba-music://"));
+  if (!deepLink) return null;
+  try {
+    const url = new URL(deepLink);
+    const code = url.searchParams.get("code");
+    return code ? code.trim().toUpperCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function claimFromDeepLink(code: string): Promise<void> {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    await createWindow();
+  }
+  mainWindow?.show();
+  mainWindow?.focus();
+  try {
+    const config = await performClaim(code, "KPEBA Music Companion");
+    mainWindow?.webContents.send("pairing:claimed", { ok: true, config });
+  } catch (error) {
+    mainWindow?.webContents.send("pairing:claimed", { ok: false, error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
+// Dev mode (npm run start) launches via a generic Electron binary, so the OS-level protocol
+// registration needs the extra argv hint; a packaged build (dist:win) doesn't.
+if (process.defaultApp && process.argv.length >= 2) {
+  app.setAsDefaultProtocolClient("kpeba-music", process.execPath, [resolve(process.argv[1])]);
+} else {
+  app.setAsDefaultProtocolClient("kpeba-music");
+}
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (_event, argv) => {
+    const code = extractPairingCodeFromArgv(argv);
+    if (code) {
+      void claimFromDeepLink(code);
+    } else if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
+// macOS delivers the URL through this event instead of argv/second-instance.
+app.on("open-url", (event, url) => {
+  event.preventDefault();
+  const code = extractPairingCodeFromArgv([url]);
+  if (code) {
+    void claimFromDeepLink(code);
+  }
 });
 
 ipcMain.handle("pairing:reset", () => {

@@ -147,18 +147,36 @@ function safeHost(value) {
   }
 }
 
+async function applySuccessfulPairing(config) {
+  state.config = config;
+  els.pairingCode.value = "";
+  renderStorageWarning();
+  setConnection(true, state.config.streamer?.displayName || state.config.streamer?.twitchLogin);
+  els.pairingStatus.textContent = "Paired. Waiting for music events.";
+  connectEvents();
+  startCompanionPoller();
+  await sendStatus({ playbackState: "idle" });
+}
+
 els.claimPairing.addEventListener("click", () => {
   void withButton(els.claimPairing, async () => {
-    state.config = await api.claimPairing(els.pairingCode.value, "KPEBA Music Companion");
-    els.pairingCode.value = "";
-    renderStorageWarning();
-    setConnection(true, state.config.streamer?.displayName || state.config.streamer?.twitchLogin);
-    els.pairingStatus.textContent = "Paired. Waiting for music events.";
-    connectEvents();
-    startCompanionPoller();
-    await sendStatus({ playbackState: "idle" });
+    const config = await api.claimPairing(els.pairingCode.value, "KPEBA Music Companion");
+    await applySuccessfulPairing(config);
   });
 });
+
+// The dashboard's "Open in app" button on the Music section links to
+// kpeba-music://pair?code=XXXXXXXX — main.ts catches that, claims the code itself, and fires
+// this event so the already-open (or just-launched) app finishes pairing with zero typing.
+if (typeof api.onDeepLinkClaimed === "function") {
+  api.onDeepLinkClaimed((result) => {
+    if (result.ok) {
+      void applySuccessfulPairing(result.config);
+    } else {
+      els.pairingStatus.textContent = "Pairing link failed: " + result.error;
+    }
+  });
+}
 
 els.openDashboard.addEventListener("click", () => {
   const base = state.config?.apiBaseUrl || els.apiBaseUrl.value || "https://local-ai-production.up.railway.app";

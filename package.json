@@ -1,6 +1,6 @@
 {
   "name": "music-companion",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Windows desktop companion for KPEBA Local AI Twitch song requests.",
   "author": "KPEBA",
   "private": true,
